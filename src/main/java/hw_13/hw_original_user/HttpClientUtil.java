@@ -23,7 +23,8 @@ public class HttpClientUtil {
     public static final Gson GSON = new Gson();
     public static final String USERS_END_PONT = "/users";
     public static final String POSTS_END_PONT = "/posts";
-
+    public static final String TO_DOS_END_POINT = "/todos";
+    public static final String COMMENTS_END_POINT = "/comments";
 
     public static String createNewUser(String uriString, User user) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
@@ -87,14 +88,12 @@ public class HttpClientUtil {
         String fileName = "user-" + user.getId() + "-post-" + lastPost.getId() + "-comments.json";
 
         HttpRequest requestForComments = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d/%s", uriString + POSTS_END_PONT, lastPost.getId(), "comments")))
+                .uri(URI.create(String.format("%s/%d%s", uriString + POSTS_END_PONT, lastPost.getId(), COMMENTS_END_POINT)))
                 .GET()
                 .build();
         HttpResponse<Path> responseComments = CLIENT.send(requestForComments, HttpResponse.BodyHandlers.ofFile(Paths.get(fileName)));
 
         return "comments written to file " + responseComments.body();
-
-
     }
 
     private static Post getLastPostOfUser(String uriString, User user) throws IOException, InterruptedException {
@@ -109,8 +108,9 @@ public class HttpClientUtil {
     }
 
     public static List<Task> getListOfOpenTasksForUser(String uriString, User user) throws IOException, InterruptedException {
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s%s/%d/%s", uriString, USERS_END_PONT, user.getId(), "todos")))
+                .uri(URI.create(String.format("%s%s/%d%s", uriString, USERS_END_PONT, user.getId(), TO_DOS_END_POINT)))
                 .GET()
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
