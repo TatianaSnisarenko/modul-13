@@ -1,4 +1,4 @@
-package lesson3.hw_13.hw_original_user.posts_data;
+package hw_13.hw_original_user.posts_data;
 
 public class Comment {
     private int postId;

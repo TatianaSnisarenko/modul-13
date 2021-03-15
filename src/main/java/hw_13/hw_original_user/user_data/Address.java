@@ -1,4 +1,4 @@
-package lesson3.hw_13.hw_original_user.user_data;
+package hw_13.hw_original_user.user_data;
 
 public class Address {
     private String street;

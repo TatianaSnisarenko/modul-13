@@ -1,4 +1,4 @@
-package lesson3.hw_13.hw_original_user;
+package hw_13.hw_original_user;
 
 public class Task {
     private int userId;

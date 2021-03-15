@@ -1,10 +1,10 @@
-package lesson3.hw_13.hw_original_user;
+package hw_13.hw_original_user;
 
 import com.google.gson.Gson;
-import lesson3.hw_13.hw_original_user.user_data.Address;
-import lesson3.hw_13.hw_original_user.user_data.Company;
-import lesson3.hw_13.hw_original_user.user_data.Geo;
-import lesson3.hw_13.hw_original_user.user_data.User;
+import hw_13.hw_original_user.user_data.Address;
+import hw_13.hw_original_user.user_data.Company;
+import hw_13.hw_original_user.user_data.Geo;
+import hw_13.hw_original_user.user_data.User;
 
 import java.io.IOException;
 import java.util.List;

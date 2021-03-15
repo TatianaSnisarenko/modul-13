@@ -1,9 +1,9 @@
-package lesson3.hw_13.hw_original_user;
+package hw_13.hw_original_user;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import lesson3.hw_13.hw_original_user.posts_data.Post;
-import lesson3.hw_13.hw_original_user.user_data.User;
+import hw_13.hw_original_user.posts_data.Post;
+import hw_13.hw_original_user.user_data.User;
 
 import java.io.IOException;
 import java.net.URI;
