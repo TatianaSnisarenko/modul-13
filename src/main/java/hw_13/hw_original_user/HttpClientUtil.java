@@ -12,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +21,13 @@ public class HttpClientUtil {
 
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
     public static final Gson GSON = new Gson();
+    public static final String USERS_END_PONT = "/users";
+    public static final String POSTS_END_PONT = "/posts";
+
 
     public static String createNewUser(String uriString, User user) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriString))
+                .uri(URI.create(uriString + USERS_END_PONT))
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
                 .header("Content-type", "application/json")
                 .build();
@@ -34,7 +38,7 @@ public class HttpClientUtil {
     public static String updateUser(String uriString, int userId, User updatedUser) throws IOException, InterruptedException {
         String requestBody = GSON.toJson(updatedUser);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d", uriString, userId)))
+                .uri(URI.create(String.format("%s%s/%d", uriString, USERS_END_PONT, userId)))
                 .header("Content-type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
@@ -45,7 +49,7 @@ public class HttpClientUtil {
     public static int deleteUser(String uriString, User user) throws IOException, InterruptedException {
         String requestBody = GSON.toJson(user);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d", uriString, user.getId())))
+                .uri(URI.create(String.format("%s%s/%d", uriString, USERS_END_PONT, user.getId())))
                 .header("Content-type", "application/json")
                 .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
@@ -55,7 +59,7 @@ public class HttpClientUtil {
 
     public static List<User> getAllUsers(String uriString) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriString))
+                .uri(URI.create(uriString + USERS_END_PONT))
                 .GET()
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -65,7 +69,7 @@ public class HttpClientUtil {
 
     public static User getUserById(String uriString, int id) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d", uriString, id)))
+                .uri(URI.create(String.format("%s%s/%d", uriString, USERS_END_PONT, id)))
                 .GET()
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -74,21 +78,16 @@ public class HttpClientUtil {
 
     public static User getUserByName(String uriString, String name) throws IOException, InterruptedException {
         List<User> allUsers = getAllUsers(uriString);
-        List<User> filteredUsersByName = allUsers.stream().filter(user -> user.getName().equals(name)).collect(Collectors.toList());
-        if (filteredUsersByName.size() != 0) {
-            return filteredUsersByName.get(0);
-        } else {
-            return null;
-        }
+        return allUsers.stream().filter(user -> user.getName().equals(name)).findAny().orElse(new User());
     }
 
-    public static String getAllCommentsForLastPostOfUser(String usersUriString, String postsUriString, User user) throws IOException, InterruptedException {
-        Post lastPost = getLastPostOfUser(usersUriString, user);
+    public static String getAllCommentsForLastPostOfUser(String uriString, User user) throws IOException, InterruptedException {
+        Post lastPost = getLastPostOfUser(uriString + USERS_END_PONT, user);
 
         String fileName = "user-" + user.getId() + "-post-" + lastPost.getId() + "-comments.json";
 
         HttpRequest requestForComments = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d/%s", postsUriString, lastPost.getId(), "comments")))
+                .uri(URI.create(String.format("%s/%d/%s", uriString + POSTS_END_PONT, lastPost.getId(), "comments")))
                 .GET()
                 .build();
         HttpResponse<Path> responseComments = CLIENT.send(requestForComments, HttpResponse.BodyHandlers.ofFile(Paths.get(fileName)));
@@ -98,20 +97,20 @@ public class HttpClientUtil {
 
     }
 
-    private static Post getLastPostOfUser(String usersUriString, User user) throws IOException, InterruptedException {
+    private static Post getLastPostOfUser(String uriString, User user) throws IOException, InterruptedException {
         HttpRequest requestForPosts = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d/%s", usersUriString, user.getId(), "posts")))
+                .uri(URI.create(String.format("%s/%d/%s", uriString, user.getId(), "posts")))
                 .GET()
                 .build();
         HttpResponse<String> responsePosts = CLIENT.send(requestForPosts, HttpResponse.BodyHandlers.ofString());
         List<Post> allUserPosts = GSON.fromJson(responsePosts.body(), new TypeToken<List<Post>>() {
         }.getType());
-        return allUserPosts.stream().max(Comparator.comparingInt(Post::getId)).get();
+        return Collections.max(allUserPosts, Comparator.comparingInt(Post::getId));
     }
 
     public static List<Task> getListOfOpenTasksForUser(String uriString, User user) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s/%d/%s", uriString, user.getId(), "todos")))
+                .uri(URI.create(String.format("%s%s/%d/%s", uriString, USERS_END_PONT, user.getId(), "todos")))
                 .GET()
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
