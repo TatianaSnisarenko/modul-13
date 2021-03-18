@@ -11,7 +11,6 @@ import java.util.List;
 
 public class Main {
     public static final Gson GSON = new Gson();
-    public static final String DEFAULT_URI = "https://jsonplaceholder.typicode.com";
     public static final int DEFAULT_USER_ID_TO_OPERATE = 1;
     public static final String DEFAULT_USER_NAME = "Ervin Howell";
 
@@ -22,7 +21,7 @@ public class Main {
         System.out.println("Testing task 1.1: creating new User");
         User userToCreate = createDefaultUser();
         System.out.println("userToCreate = " + userToCreate);
-        User createdUser = GSON.fromJson(HttpClientUtil.createNewUser(DEFAULT_URI, userToCreate), User.class);
+        User createdUser = GSON.fromJson(HttpClientUtil.createNewUser(userToCreate), User.class);
         System.out.println("createdUser = " + createdUser);
 
         printingDelimeterBetweenTasks();
@@ -40,7 +39,7 @@ public class Main {
         updatedUser.setPhone(createdUser.getPhone());
         updatedUser.setCompany(createdUser.getCompany());
 
-        String s = HttpClientUtil.updateUser(DEFAULT_URI, DEFAULT_USER_ID_TO_OPERATE, updatedUser);
+        String s = HttpClientUtil.updateUser(DEFAULT_USER_ID_TO_OPERATE, updatedUser);
         User checkUpdatedUser = GSON.fromJson(s, User.class);
         System.out.println(checkUpdatedUser);
 
@@ -51,14 +50,14 @@ public class Main {
         System.out.println("Testing task 1.3: deleting the User");
         createdUser.setId(DEFAULT_USER_ID_TO_OPERATE);
         System.out.println("Status for delete operation: " +
-                HttpClientUtil.deleteUser(DEFAULT_URI, createdUser));
+                HttpClientUtil.deleteUser(createdUser));
 
         printingDelimeterBetweenTasks();
 
         //Task 1.4
 
         System.out.println("Testing task 1.4: getting all users");
-        List<User> allUsers = HttpClientUtil.getAllUsers(DEFAULT_URI);
+        List<User> allUsers = HttpClientUtil.getAllUsers();
         allUsers.forEach(System.out::println);
 
         printingDelimeterBetweenTasks();
@@ -66,14 +65,14 @@ public class Main {
         //Task 1.5
 
         System.out.println("Testing task 1.5: getting User by Id = 1");
-        System.out.println("userGottenByIdOne = " + HttpClientUtil.getUserById(DEFAULT_URI, DEFAULT_USER_ID_TO_OPERATE));
+        System.out.println("userGottenByIdOne = " + HttpClientUtil.getUserById(DEFAULT_USER_ID_TO_OPERATE));
 
         printingDelimeterBetweenTasks();
 
         //Task 1.6
 
         System.out.println("Testing task 1.6: getting User by Name = Ervin Howell");
-        System.out.println("userGottenByName = " + HttpClientUtil.getUserByName(DEFAULT_URI, DEFAULT_USER_NAME));
+        System.out.println("userGottenByName = " + HttpClientUtil.getUserByName(DEFAULT_USER_NAME));
 
         printingDelimeterBetweenTasks();
 
@@ -81,7 +80,7 @@ public class Main {
 
         System.out.println("Testing task 2: getting all comments for last Post of User with id = 1: ");
         System.out.println();
-        System.out.println(HttpClientUtil.getAllCommentsForLastPostOfUser(DEFAULT_URI, createdUser));
+        System.out.println(HttpClientUtil.getAllCommentsForLastPostOfUser(createdUser));
 
         printingDelimeterBetweenTasks();
 
@@ -92,7 +91,7 @@ public class Main {
         System.out.println("List of open tasks: ");
         System.out.println();
 
-        List<Task> allOpenTasks = HttpClientUtil.getListOfOpenTasksForUser(DEFAULT_URI, createdUser);
+        List<Task> allOpenTasks = HttpClientUtil.getListOfOpenTasksForUser(createdUser);
         allOpenTasks.forEach(System.out::println);
 
     }
